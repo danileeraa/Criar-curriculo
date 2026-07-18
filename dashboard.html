@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - CurriFlow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <a href="dashboard.html" class="header-logo">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      CurriFlow
+    </a>
+    <div class="header-nav">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar"></div>
+        <span id="userName"></span>
+      </div>
+      <button class="btn btn-sm btn-secondary" onclick="Auth.logout(); window.location.href='index.html'">Sair</button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <h1>Meus Currículos</h1>
+        <p>Gerencie todos os seus currículos em um só lugar.</p>
+      </div>
+      <a href="builder.html" class="btn btn-primary btn-lg">+ Novo Currículo</a>
+    </div>
+    <div class="resume-grid" id="resumeGrid">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="deleteModal" onclick="if(event.target===this)this.classList.remove('active')">
+    <div class="modal">
+      <h2>Excluir Currículo</h2>
+      <p style="color:var(--text-light);margin-bottom:16px">Tem certeza que deseja excluir este currículo? Esta ação não pode ser desfeita.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="document.getElementById('deleteModal').classList.remove('active')">Cancelar</button>
+        <button class="btn btn-danger" onclick="Dashboard.confirmDeleteAction()">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

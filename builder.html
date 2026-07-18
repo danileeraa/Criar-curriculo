@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Currículo - CurriFlow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Merriweather:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header no-print">
+    <a href="dashboard.html" class="header-logo">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      CurriFlow
+    </a>
+    <div class="header-nav">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar"></div>
+        <span id="userName"></span>
+      </div>
+      <a href="dashboard.html" class="btn btn-sm btn-secondary">Dashboard</a>
+      <button class="btn btn-sm btn-secondary" onclick="Auth.logout(); window.location.href='index.html'">Sair</button>
+    </div>
+  </header>
+
+  <main class="main-content no-print" style="padding-bottom:80px">
+    <div class="builder-container">
+      <div class="builder-form">
+        <h2>Informações Pessoais</h2>
+
+        <div class="form-section">
+          <div class="form-group">
+            <label>Nome completo *</label>
+            <input id="fullName" placeholder="Maria Silva Santos">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Título profissional</label>
+              <input id="professionalTitle" placeholder="Desenvolvedora Full Stack">
+            </div>
+            <div class="form-group">
+              <label>Foto</label>
+              <div class="photo-upload">
+                <div class="photo-preview" id="photoPreview">
+                  <div class="placeholder">👤</div>
+                </div>
+                <label class="photo-upload-btn">
+                  <input type="file" id="photoInput" accept="image/*" hidden>
+                  Upload
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Resumo profissional</label>
+            <textarea id="summary" rows="3" placeholder="Profissional com X anos de experiência em..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            Contato
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email</label>
+              <input id="email" type="email" placeholder="maria@email.com">
+            </div>
+            <div class="form-group">
+              <label>Telefone</label>
+              <input id="phone" placeholder="(11) 99999-8888">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Endereço</label>
+              <input id="address" placeholder="São Paulo, SP">
+            </div>
+            <div class="form-group">
+              <label>Site / Portfólio</label>
+              <input id="website" placeholder="https://meusite.com">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+            Redes Sociais
+          </div>
+          <div id="socialContainer"></div>
+          <button class="add-btn" onclick="addSocial()">+ Adicionar Rede Social</button>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            Formação Acadêmica
+          </div>
+          <div id="educationContainer"></div>
+          <button class="add-btn" onclick="addEducation()">+ Adicionar Formação</button>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            Experiência Profissional
+          </div>
+          <div id="experienceContainer"></div>
+          <button class="add-btn" onclick="addExperience()">+ Adicionar Experiência</button>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            Habilidades
+          </div>
+          <div id="skillsContainer"></div>
+          <button class="add-btn" onclick="addSkill()">+ Adicionar Habilidade</button>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Idiomas
+          </div>
+          <div id="languagesContainer"></div>
+          <button class="add-btn" onclick="addLanguage()">+ Adicionar Idioma</button>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+            Certificações
+          </div>
+          <div id="certsContainer"></div>
+          <button class="add-btn" onclick="addCertification()">+ Adicionar Certificação</button>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            Projetos
+          </div>
+          <div id="projectsContainer"></div>
+          <button class="add-btn" onclick="addProject()">+ Adicionar Projeto</button>
+        </div>
+      </div>
+
+      <div class="builder-preview">
+        <div class="preview-controls">
+          <select id="templateSelect">
+            <option value="desenvolvedor">Desenvolvedor</option>
+            <option value="designer">Designer</option>
+            <option value="advocacia">Advocacia</option>
+            <option value="medicina">Medicina</option>
+            <option value="engenharia">Engenharia</option>
+            <option value="marketing">Marketing</option>
+            <option value="professor">Professor</option>
+            <option value="administrativo">Administrativo</option>
+            <option value="jovem-aprendiz">Jovem Aprendiz</option>
+            <option value="executivo">Executivo</option>
+          </select>
+          <select id="fontSelect">
+            <option value="Inter">Inter</option>
+            <option value="Roboto">Roboto</option>
+            <option value="Open Sans">Open Sans</option>
+            <option value="Lato">Lato</option>
+            <option value="Montserrat">Montserrat</option>
+            <option value="Poppins">Poppins</option>
+            <option value="Raleway">Raleway</option>
+            <option value="Playfair Display">Playfair Display</option>
+            <option value="Merriweather">Merriweather</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Arial">Arial</option>
+          </select>
+        </div>
+        <div class="preview-frame" id="previewFrame">
+          <div class="preview-content template-desenvolvedor" id="previewContent" style="font-family:'Inter',sans-serif">
+            <div style="text-align:center;padding:80px 20px;color:#94a3b8">
+              <p style="font-size:1.1rem">Preencha os dados ao lado</p>
+              <p style="font-size:0.9rem;margin-top:8px">O preview do currículo aparecerá aqui em tempo real</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="save-bar no-print" id="saveBar">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-weight:600;font-size:0.9rem">CurriFlow</span>
+      <span style="font-size:0.8rem;color:var(--text-light)">Suas alterações são salvas localmente</span>
+    </div>
+    <div class="save-bar-actions">
+      <button class="btn btn-sm btn-secondary" onclick="window.location.href='dashboard.html'">Voltar</button>
+      <button class="btn btn-sm btn-secondary" id="printBtn">Imprimir</button>
+      <button class="btn btn-sm btn-secondary" id="exportImgBtn">Salvar PNG</button>
+      <button class="btn btn-sm btn-primary" id="exportPdfBtn">Salvar PDF</button>
+      <button class="btn btn-sm btn-success" id="saveBtn">Salvar</button>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/builder.js"></script>
+</body>
+</html>
