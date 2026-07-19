@@ -40,8 +40,9 @@
     data.social = [];
     socialItems.forEach(row => {
       const platform = row.querySelector('select')?.value;
-      const url = row.querySelector('input')?.value;
-      if (url) data.social.push({ platform, url });
+      const url = row.querySelector('.social-url')?.value;
+      const name = row.querySelector('.social-name')?.value;
+      if (url) data.social.push({ platform, url, displayName: name || platform });
     });
 
     const educationItems = document.querySelectorAll('.education-item');
@@ -143,9 +144,12 @@
       ? `<img src="${p.photo}" alt="Foto">`
       : `<div class="no-photo">👤</div>`;
 
-    const socialHtml = (data.social || []).map(s =>
-      `<a href="${escapeHtml(s.url)}" target="_blank" title="${escapeHtml(s.platform)}">${escapeHtml(s.platform.charAt(0).toUpperCase())}</a>`
-    ).join('');
+    const socialIcons = { LinkedIn:'💼', GitHub:'💻', Twitter:'🐦', Instagram:'📸', Facebook:'👍', YouTube:'▶️', Portfolio:'🌐', Outro:'🔗' };
+    const socialHtml = (data.social || []).map(s => {
+      const icon = socialIcons[s.platform] || '🔗';
+      const name = s.displayName || s.platform;
+      return `<a href="${escapeHtml(s.url)}" target="_blank" title="${escapeHtml(s.platform)}">${icon} ${escapeHtml(name)}</a>`;
+    }).join('');
 
     const educationHtml = (data.education || []).filter(e => e.institution || e.degree).map(e => `
       <div class="entry">
@@ -707,7 +711,10 @@
         <option value="Portfolio" ${data?.platform==='Portfolio'?'selected':''}>Portfólio</option>
         <option value="Outro" ${data?.platform==='Outro'?'selected':''}>Outro</option>
       </select>
-      <input placeholder="URL completa (https://...)" value="${escapeHtml(data?.url || '')}">
+      <div style="display:flex;gap:6px;flex:1;flex-wrap:wrap">
+        <input class="social-name" placeholder="Nome do perfil" value="${escapeHtml(data?.displayName || '')}" style="flex:1;min-width:100px">
+        <input class="social-url" placeholder="URL completa (https://...)" value="${escapeHtml(data?.url || '')}" style="flex:2;min-width:180px">
+      </div>
       <button class="remove-social" onclick="this.parentElement.remove(); renderPreview();" title="Remover">&times;</button>
     `;
     container.appendChild(div);
@@ -740,7 +747,7 @@
       document.getElementById('photoPreview').innerHTML = `<img src="${p.photo}" alt="Foto">`;
     }
 
-    (resume.social || []).forEach(s => addSocial(s));
+    (resume.social || []).forEach(s => { if (!s.displayName) s.displayName = s.platform; addSocial(s); });
     function normalizeDate(d) { return d && d.match(/^\d{4}-\d{2}$/) ? d + '-01' : d; }
     (resume.education || []).forEach(e => { e.startDate = normalizeDate(e.startDate); e.endDate = normalizeDate(e.endDate); addEducation(e); });
     (resume.experience || []).forEach(e => { e.startDate = normalizeDate(e.startDate); e.endDate = normalizeDate(e.endDate); addExperience(e); });

@@ -739,22 +739,24 @@ a:hover { color: var(--primary-dark); }
 
 .social-icons {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   flex-wrap: wrap;
   margin-top: 8px;
 }
 
 .social-icons a {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: var(--bg);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--bg);
   color: var(--text-light);
   font-size: 0.8rem;
+  text-decoration: none;
   transition: var(--transition);
   border: 1px solid var(--border);
+  white-space: nowrap;
 }
 .social-icons a:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 
