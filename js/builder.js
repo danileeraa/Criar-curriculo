@@ -40,9 +40,8 @@
     data.social = [];
     socialItems.forEach(row => {
       const platform = row.querySelector('select')?.value;
-      const url = row.querySelector('.social-url')?.value;
-      const name = row.querySelector('.social-name')?.value;
-      if (url) data.social.push({ platform, url, displayName: name || platform });
+      const url = row.querySelector('input')?.value;
+      if (url) data.social.push({ platform, url });
     });
 
     const educationItems = document.querySelectorAll('.education-item');
@@ -145,9 +144,20 @@
       : `<div class="no-photo">👤</div>`;
 
     const socialIcons = { LinkedIn:'💼', GitHub:'💻', Twitter:'🐦', Instagram:'📸', Facebook:'👍', YouTube:'▶️', Portfolio:'🌐', Outro:'🔗' };
+    function extractProfileName(url, platform) {
+      try {
+        const u = new URL(url);
+        const path = u.pathname.replace(/\/+$/, '');
+        if (platform === 'LinkedIn') return path.replace(/\/in\/|\/company\//g, '') || platform;
+        if (platform === 'GitHub' || platform === 'Twitter' || platform === 'Instagram' || platform === 'Facebook')
+          return path.replace(/^\//, '').split('/')[0] || platform;
+        if (platform === 'YouTube') return path.replace(/^\/@/, '').split('/')[0] || platform;
+        return path.replace(/^\//, '').split('/')[0] || platform;
+      } catch { return platform; }
+    }
     const socialHtml = (data.social || []).map(s => {
       const icon = socialIcons[s.platform] || '🔗';
-      const name = s.displayName || s.platform;
+      const name = extractProfileName(s.url, s.platform);
       return `<a href="${escapeHtml(s.url)}" target="_blank" title="${escapeHtml(s.platform)}">${icon} ${escapeHtml(name)}</a>`;
     }).join('');
 
@@ -711,10 +721,7 @@
         <option value="Portfolio" ${data?.platform==='Portfolio'?'selected':''}>Portfólio</option>
         <option value="Outro" ${data?.platform==='Outro'?'selected':''}>Outro</option>
       </select>
-      <div style="display:flex;gap:6px;flex:1;flex-wrap:wrap">
-        <input class="social-name" placeholder="Nome do perfil" value="${escapeHtml(data?.displayName || '')}" style="flex:1;min-width:100px">
-        <input class="social-url" placeholder="URL completa (https://...)" value="${escapeHtml(data?.url || '')}" style="flex:2;min-width:180px">
-      </div>
+      <input placeholder="URL completa (https://...)" value="${escapeHtml(data?.url || '')}">
       <button class="remove-social" onclick="this.parentElement.remove(); renderPreview();" title="Remover">&times;</button>
     `;
     container.appendChild(div);
@@ -747,7 +754,7 @@
       document.getElementById('photoPreview').innerHTML = `<img src="${p.photo}" alt="Foto">`;
     }
 
-    (resume.social || []).forEach(s => { if (!s.displayName) s.displayName = s.platform; addSocial(s); });
+    (resume.social || []).forEach(s => addSocial(s));
     function normalizeDate(d) { return d && d.match(/^\d{4}-\d{2}$/) ? d + '-01' : d; }
     (resume.education || []).forEach(e => { e.startDate = normalizeDate(e.startDate); e.endDate = normalizeDate(e.endDate); addEducation(e); });
     (resume.experience || []).forEach(e => { e.startDate = normalizeDate(e.startDate); e.endDate = normalizeDate(e.endDate); addExperience(e); });
