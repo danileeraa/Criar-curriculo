@@ -26,22 +26,47 @@
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
   }
 
+  const EXPORT_PADDING = 24;
+
+  function applyExportPadding(el, add) {
+    if (add) {
+      el.style.padding = EXPORT_PADDING + 'px';
+      el.style.boxSizing = 'border-box';
+    } else {
+      el.style.padding = '';
+      el.style.boxSizing = '';
+    }
+  }
+
   window.ResumeExport = {
     async downloadPDF(element) {
       try {
         await ensureLibraries();
+        applyExportPadding(element, true);
         const canvas = await html2canvas(element, {
           scale: 2,
           useCORS: true,
           logging: false,
           backgroundColor: '#ffffff'
         });
+        applyExportPadding(element, false);
         const imgData = canvas.toDataURL('image/png');
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const margin = 10;
+        const pdfWidth = pdf.internal.pageSize.getWidth() - margin * 2;
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        const pageHeight = pdf.internal.pageSize.getHeight() - margin * 2;
+        let heightLeft = pdfHeight;
+        let position = margin;
+        pdf.addImage(imgData, 'PNG', margin, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+        while (heightLeft > 0) {
+          position = margin - (pdfHeight - heightLeft);
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', margin, position, pdfWidth, pdfHeight);
+          heightLeft -= pageHeight;
+        }
         pdf.save('curriculo.pdf');
         showToast('PDF salvo com sucesso!', 'success');
       } catch (err) {
@@ -52,12 +77,14 @@
     async downloadImage(element) {
       try {
         await ensureLibraries();
+        applyExportPadding(element, true);
         const canvas = await html2canvas(element, {
           scale: 2,
           useCORS: true,
           logging: false,
           backgroundColor: '#ffffff'
         });
+        applyExportPadding(element, false);
         const link = document.createElement('a');
         link.download = 'curriculo.png';
         link.href = canvas.toDataURL('image/png');
@@ -68,33 +95,12 @@
       }
     },
 
-    print(element) {
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'fixed';
-      iframe.style.top = '-9999px';
-      iframe.style.width = '210mm';
-      iframe.style.height = '297mm';
-      document.body.appendChild(iframe);
-      const doc = iframe.contentWindow.document;
-      doc.open();
-      doc.write('<html><head>');
-      doc.write('<link rel="stylesheet" href="css/style.css">');
-      doc.write('<style>body{margin:0;padding:20px;font-family:Arial,sans-serif}</style>');
-      doc.write('</head><body>');
-      doc.write(element.innerHTML);
-      doc.write('</body></html>');
-      doc.close();
-      iframe.onload = () => {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-        setTimeout(() => document.body.removeChild(iframe), 1000);
-      };
-    },
-
     async copyToClipboard(element) {
       try {
         await ensureLibraries();
+        applyExportPadding(element, true);
         const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' });
+        applyExportPadding(element, false);
         canvas.toBlob(async (blob) => {
           try {
             await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);

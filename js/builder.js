@@ -808,9 +808,6 @@
     const imgBtn = document.getElementById('exportImgBtn');
     if (imgBtn) imgBtn.addEventListener('click', () => ResumeExport.downloadImage(document.getElementById('previewContent')));
 
-    const printBtn = document.getElementById('printBtn');
-    if (printBtn) printBtn.addEventListener('click', () => window.print());
-
     const templateSelect = document.getElementById('templateSelect');
     if (templateSelect) templateSelect.addEventListener('change', renderPreview);
 
