@@ -17,117 +17,238 @@
     const session = Auth.getSession();
     if (!session) return;
     const userResumes = resumes[session.email] || [];
-    const filtered = userResumes.filter(r => r.id !== id);
-    resumes[session.email] = filtered;
+    resumes[session.email] = userResumes.filter(r => r.id !== id);
     saveResumes(resumes);
   }
 
-  function getTemplateLabel(template) {
-    const labels = {
-      desenvolvedor: 'Desenvolvedor',
-      designer: 'Designer',
-      advocacia: 'Advocacia',
-      medicina: 'Medicina',
-      engenharia: 'Engenharia',
-      marketing: 'Marketing',
-      professor: 'Professor',
-      administrativo: 'Administrativo',
-      'jovem-aprendiz': 'Jovem Aprendiz',
-      executivo: 'Executivo'
-    };
-    return labels[template] || template;
+  let deleteTargetId = null;
+
+  function getTemplateLabel(t) {
+    const m = { desenvolvedor:'Desenvolvedor', designer:'Designer', advocacia:'Advocacia', medicina:'Medicina', engenharia:'Engenharia', marketing:'Marketing', professor:'Professor', administrativo:'Administrativo', 'jovem-aprendiz':'Jovem Aprendiz', executivo:'Executivo' };
+    return m[t] || t;
   }
 
-  function getTemplateIcon(template) {
-    const icons = {
-      desenvolvedor: '💻',
-      designer: '🎨',
-      advocacia: '⚖️',
-      medicina: '🏥',
-      engenharia: '🔧',
-      marketing: '📊',
-      professor: '📚',
-      administrativo: '📋',
-      'jovem-aprendiz': '🌱',
-      executivo: '⭐'
-    };
-    return icons[template] || '📄';
-  }
-
-  function renderResumeCard(resume, index) {
+  function renderResumeCard(resume) {
     const created = new Date(resume.createdAt || Date.now());
     const dateStr = created.toLocaleDateString('pt-BR');
-    const initials = (resume.personalInfo?.name || 'Currículo').charAt(0).toUpperCase();
-    const templateClass = `template-${resume.template || 'desenvolvedor'}`;
+    const name = resume.personalInfo?.name || 'Sem título';
+    const title = resume.personalInfo?.title || '';
+    const tpl = resume.template || 'desenvolvedor';
+    const tplColors = { desenvolvedor:'bg-emerald-500', designer:'bg-pink-500', advocacia:'bg-amber-600', medicina:'bg-teal-500', engenharia:'bg-blue-500', marketing:'bg-orange-500', professor:'bg-indigo-500', administrativo:'bg-slate-500', 'jovem-aprendiz':'bg-cyan-500', executivo:'bg-yellow-500' };
+    const dot = tplColors[tpl] || 'bg-blue-500';
 
     return `
-      <div class="resume-card" data-id="${resume.id}">
-        <div class="resume-card-preview ${templateClass}">
-          ${getTemplateIcon(resume.template || 'desenvolvedor')}
-        </div>
-        <div class="resume-card-body">
-          <h3 title="${resume.personalInfo?.name || 'Sem título'}">${resume.personalInfo?.name || 'Sem título'}</h3>
-          <div class="resume-meta">
-            ${dateStr}
-            ${resume.personalInfo?.title ? '&middot; ' + resume.personalInfo.title : ''}
+      <div class="p-6 hover:bg-slate-50/50 transition-colors flex flex-col md:flex-row md:items-center md:justify-between gap-5 border-b border-slate-100">
+        <div class="flex items-start gap-4 flex-1 min-w-0">
+          <div class="w-12 h-16 bg-slate-50 border border-slate-200 shadow-sm rounded-lg shrink-0 overflow-hidden flex flex-col justify-between p-1.5">
+            <div class="space-y-0.5">
+              <div class="h-1 w-6 rounded-full ${dot}"></div>
+              <div class="h-0.5 w-8 bg-slate-200"></div>
+              <div class="h-0.5 w-7 bg-slate-200"></div>
+              <div class="h-0.5 w-6 bg-slate-200"></div>
+            </div>
+            <div class="h-0.5 w-4 bg-slate-200"></div>
           </div>
-          <div class="resume-card-actions">
-            <button class="btn btn-sm btn-primary" onclick="location.href='builder.html?id=${resume.id}'">Abrir</button>
-            <button class="btn btn-sm btn-secondary" onclick="location.href='builder.html?id=${resume.id}'">Editar</button>
-            <button class="btn btn-sm btn-danger" onclick="Dashboard.confirmDelete('${resume.id}')">Excluir</button>
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <h3 class="font-bold text-slate-800 text-base truncate">${escapeHtml(name)}</h3>
+              <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full"><svg class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Salvo</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-500 mt-1">
+              <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full ${dot}"></span> ${escapeHtml(getTemplateLabel(tpl))}</span>
+              <span class="flex items-center gap-1"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> ${dateStr}</span>
+              ${title ? `<span class="flex items-center gap-1"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> ${escapeHtml(title)}</span>` : ''}
+            </div>
           </div>
         </div>
-      </div>
-    `;
+        <div class="flex items-center flex-wrap gap-2 self-start md:self-auto">
+          <button onclick="location.href='builder.html?id=${resume.id}'" class="py-1.5 px-3.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl font-bold text-xs transition-colors cursor-pointer">Editar</button>
+          <button onclick="Dashboard.confirmDelete('${resume.id}')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 border border-transparent rounded-xl transition-colors cursor-pointer" title="Excluir">
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+      </div>`;
+  }
+
+  function escapeHtml(t) {
+    if (!t) return '';
+    const d = document.createElement('div');
+    d.textContent = t;
+    return d.innerHTML;
   }
 
   function loadDashboard() {
     if (!Auth.checkAuth('index.html')) return;
-
     const user = Auth.getCurrentUser();
     if (!user) return;
 
     document.getElementById('userName').textContent = user.name;
+    document.getElementById('userEmail').textContent = user.email;
     document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
 
     const resumes = getResumes();
     const userResumes = resumes[user.email] || [];
     const grid = document.getElementById('resumeGrid');
+    const countEl = document.getElementById('resumeCount');
+    const emptyState = document.getElementById('emptyState');
+
+    const templateCounts = {};
+    userResumes.forEach(r => {
+      const t = r.template || 'desenvolvedor';
+      templateCounts[t] = (templateCounts[t] || 0) + 1;
+    });
+    let favTemplate = '-';
+    let maxCount = 0;
+    for (const [tpl, count] of Object.entries(templateCounts)) {
+      if (count > maxCount) { maxCount = count; favTemplate = getTemplateLabel(tpl); }
+    }
+
+    document.getElementById('kpiTotal').textContent = userResumes.length;
+    document.getElementById('kpiDrafts').textContent = userResumes.length;
+    document.getElementById('kpiExports').textContent = '0';
+    document.getElementById('kpiFavorite').textContent = favTemplate;
 
     if (userResumes.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          <h3>Nenhum currículo criado ainda</h3>
-          <p>Crie seu primeiro currículo profissional em poucos minutos.</p>
-          <button class="btn btn-primary btn-lg" onclick="location.href='builder.html'">Criar Currículo</button>
-        </div>
-      `;
+      if (emptyState) emptyState.style.display = 'block';
+      grid.innerHTML = '';
+      if (countEl) countEl.textContent = '0 documentos';
       return;
     }
 
+    if (emptyState) emptyState.style.display = 'none';
+    if (countEl) countEl.textContent = userResumes.length + ' documento' + (userResumes.length !== 1 ? 's' : '');
     grid.innerHTML = userResumes
       .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
       .map(r => renderResumeCard(r))
       .join('');
   }
 
-  function exportData() {
+  // Import resume data (JSON/text - no AI)
+  let importType = 'json';
+
+  window.setImportType = function(type) {
+    importType = type;
+    document.querySelectorAll('.import-type-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.type === type);
+      b.classList.toggle('bg-white', b.dataset.type === type);
+      b.classList.toggle('text-slate-800', b.dataset.type === type);
+      b.classList.toggle('shadow-xs', b.dataset.type === type);
+      b.classList.toggle('text-slate-400', b.dataset.type !== type);
+      b.classList.toggle('hover:text-slate-600', b.dataset.type !== type);
+    });
+    document.getElementById('importLabel').textContent = type === 'json' ? 'Cole o conteúdo JSON' : 'Cole o texto do currículo';
+    document.getElementById('importContent').placeholder = type === 'json'
+      ? '{"name":"João","professionalTitle":"...", ...}'
+      : 'Nome: João Silva\nCargo: Engenheiro\nExperiência: ...';
+    document.getElementById('importFileInput').accept = type === 'json' ? '.json' : '.json,.txt';
+  };
+
+  window.handleImportFile = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.getElementById('importContent').value = ev.target.result;
+      if (file.name.endsWith('.json')) setImportType('json');
+    };
+    reader.readAsText(file);
+  };
+
+  document.getElementById('importForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const content = document.getElementById('importContent').value.trim();
+    const errorEl = document.getElementById('importError');
+    const errorText = document.getElementById('importErrorText');
+    const successEl = document.getElementById('importSuccess');
+    errorEl.classList.add('hidden');
+    successEl.classList.add('hidden');
+
+    if (!content) {
+      errorText.textContent = 'Cole o conteúdo ou faça upload de um arquivo.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
+    let parsedData;
+    if (importType === 'json') {
+      try { parsedData = JSON.parse(content); }
+      catch { errorText.textContent = 'JSON inválido. Verifique a sintaxe.'; errorEl.classList.remove('hidden'); return; }
+    } else {
+      parsedData = { summary: content };
+    }
+
+    const user = Auth.getCurrentUser();
+    if (!user) { errorText.textContent = 'Faça login primeiro.'; errorEl.classList.remove('hidden'); return; }
+
+    const tpl = document.getElementById('importTemplate')?.value || 'desenvolvedor';
+    const resumes = getResumes();
+    const userResumes = resumes[user.email] || [];
+
+    const newResume = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      template: tpl,
+      font: 'Inter',
+      personalInfo: {
+        name: parsedData.name || '',
+        title: parsedData.professionalTitle || parsedData.title || '',
+        email: parsedData.email || '',
+        phone: parsedData.phone || '',
+        address: parsedData.location || parsedData.address || '',
+        website: parsedData.website || '',
+        summary: parsedData.summary || '',
+        photo: parsedData.photo || ''
+      },
+      social: (parsedData.socials || parsedData.social || []).map(s => ({ platform: s.platform || 'Outro', url: s.url || '' })),
+      education: (parsedData.education || []).map(e => ({
+        institution: e.institution || '', degree: e.degree || '', field: e.fieldOfStudy || e.field || '',
+        startDate: e.startDate || '', endDate: e.endDate || '', description: e.description || ''
+      })),
+      experience: (parsedData.experience || []).map(e => ({
+        company: e.company || '', position: e.position || '',
+        startDate: e.startDate || '', endDate: e.endDate || '', current: !!e.current,
+        location: e.location || '', description: e.description || ''
+      })),
+      skills: (parsedData.skills || []).map(s => ({
+        name: s.name || '', level: s.level || 50, category: s.category || 'technical'
+      })),
+      languages: (parsedData.languages || []).map(l => ({
+        name: l.name || '', proficiency: l.proficiency || 'Intermediário'
+      })),
+      certifications: (parsedData.certifications || []).map(c => ({
+        name: c.name || '', issuer: c.issuer || '', date: c.date || '', description: c.description || ''
+      })),
+      projects: (parsedData.projects || []).map(p => ({
+        name: p.title || p.name || '', techs: p.subtitle || p.techs || '', description: p.description || ''
+      }))
+    };
+
+    userResumes.push(newResume);
+    resumes[user.email] = userResumes;
+    saveResumes(resumes);
+
+    successEl.classList.remove('hidden');
+    document.getElementById('importContent').value = '';
+    loadDashboard();
+
+    setTimeout(() => { window.location.href = 'builder.html?id=' + newResume.id; }, 1200);
+  });
+
+  // Export/Import full backup
+  window.exportData = function() {
     const data = localStorage.getItem('curriculo_app');
     if (!data) { alert('Nenhum dado para exportar.'); return; }
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = 'curriculo-backup.json';
-    a.click();
+    a.href = url; a.download = 'curriculo-backup.json'; a.click();
     URL.revokeObjectURL(url);
-  }
+  };
 
-  function importData() {
+  window.importBackup = function() {
     const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
+    input.type = 'file'; input.accept = '.json';
     input.onchange = e => {
       const file = e.target.files[0];
       if (!file) return;
@@ -135,67 +256,44 @@
       reader.onload = ev => {
         try {
           const data = JSON.parse(ev.target.result);
-          if (!data.users && !data.resumes) throw new Error('Arquivo inválido');
-          const existing = localStorage.getItem('curriculo_app');
-          if (existing && !confirm('Isso substituirá todos os dados locais. Continuar?')) return;
+          if (!data.users) throw new Error('inválido');
+          if (localStorage.getItem('curriculo_app') && !confirm('Substituir todos os dados locais?')) return;
           localStorage.setItem('curriculo_app', JSON.stringify(data));
-          alert('Dados importados com sucesso!');
+          alert('Backup importado!');
           location.reload();
-        } catch {
-          alert('Arquivo inválido. Selecione um backup válido.');
-        }
+        } catch { alert('Arquivo inválido.'); }
       };
       reader.readAsText(file);
     };
     input.click();
-  }
+  };
+
+  window.closeDeleteModal = function() {
+    document.getElementById('deleteModal').classList.add('hidden');
+    document.getElementById('deleteModal').classList.remove('flex');
+  };
 
   window.Dashboard = {
     load: loadDashboard,
-
     confirmDelete(id) {
+      deleteTargetId = id;
       const modal = document.getElementById('deleteModal');
-      if (!modal) {
-        if (confirm('Tem certeza que deseja excluir este currículo?')) {
-          deleteResume(id);
-          loadDashboard();
-          const t = document.createElement('div');
-          t.className = 'toast success';
-          t.textContent = 'Currículo excluído.';
-          document.body.appendChild(t);
-          requestAnimationFrame(() => t.classList.add('show'));
-          setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3000);
-        }
-        return;
-      }
-      modal.classList.add('active');
-      modal.dataset.resumeId = id;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
     },
-
     confirmDeleteAction() {
-      const modal = document.getElementById('deleteModal');
-      const id = modal.dataset.resumeId;
-      if (id) {
-        deleteResume(id);
+      if (deleteTargetId) {
+        deleteResume(deleteTargetId);
         loadDashboard();
-        modal.classList.remove('active');
-        const t = document.createElement('div');
-        t.className = 'toast success';
-        t.textContent = 'Currículo excluído.';
-        document.body.appendChild(t);
-        requestAnimationFrame(() => t.classList.add('show'));
-        setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3000);
+        window.closeDeleteModal();
       }
     }
   };
 
   document.addEventListener('DOMContentLoaded', () => {
     Dashboard.load();
-    const modal = document.getElementById('deleteModal');
-    if (modal) {
-      document.querySelector('.modal-overlay')?.addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) modal.classList.remove('active');
-      });
-    }
+    document.getElementById('deleteModal')?.addEventListener('click', function(e) {
+      if (e.target === this) window.closeDeleteModal();
+    });
   });
 })();
