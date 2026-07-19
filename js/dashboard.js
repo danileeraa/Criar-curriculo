@@ -140,19 +140,38 @@
     document.getElementById('importContent').placeholder = type === 'json'
       ? '{"name":"João","professionalTitle":"...", ...}'
       : 'Nome: João Silva\nCargo: Engenheiro\nExperiência: ...';
-    document.getElementById('importFileInput').accept = type === 'json' ? '.json' : '.json,.txt';
+    document.getElementById('importFileInput').accept = type === 'json' ? '.json' : '.txt';
   };
 
   window.handleImportFile = function(e) {
     const file = e.target.files[0];
     if (!file) return;
+    const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    const isImage = file.type.startsWith('image/');
+    if (isPDF || isImage) {
+      showMessage('Arquivo não suportado para importação. Use arquivo .json exportado do sistema.', 'error');
+      e.target.value = '';
+      return;
+    }
     const reader = new FileReader();
     reader.onload = ev => {
       document.getElementById('importContent').value = ev.target.result;
       if (file.name.endsWith('.json')) setImportType('json');
     };
+    reader.onerror = () => {
+      showMessage('Erro ao ler o arquivo.', 'error');
+      e.target.value = '';
+    };
     reader.readAsText(file);
   };
+
+  function showMessage(text, type) {
+    const el = document.getElementById(type === 'error' ? 'importError' : 'importSuccess');
+    const textEl = document.getElementById(type === 'error' ? 'importErrorText' : 'importSuccessText');
+    document.getElementById('importError').classList.add('hidden');
+    document.getElementById('importSuccess').classList.add('hidden');
+    if (el) { textEl.textContent = text; el.classList.remove('hidden'); }
+  }
 
   document.getElementById('importForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
