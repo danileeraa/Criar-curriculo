@@ -871,32 +871,40 @@ a:hover { color: var(--primary-dark); }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .header { padding: 0 16px; }
-  .main-content { padding: 20px 16px; }
+  .header { padding: 0 12px; height: 56px; }
+  .header .logo { font-size: 1rem; }
+  .main-content { padding: 16px 12px; }
   .auth-card { padding: 28px 20px; }
   .form-row { grid-template-columns: 1fr; }
   .form-row-3 { grid-template-columns: 1fr; }
-  .builder-form { padding: 20px; }
-  .preview-content { padding: 20px; }
+  .builder-form { padding: 16px; }
+  .builder-form h2 { font-size: 1rem; }
+  .preview-content { padding: 16px; font-size: 12px; }
   .template-desenvolvedor .resume-body { grid-template-columns: 1fr; }
   .template-engenharia .resume-body { grid-template-columns: 1fr; }
   .template-administrativo .resume-body { grid-template-columns: 1fr; }
   .template-designer .resume-header { flex-direction: column; text-align: center; }
   .template-jovem-aprendiz .resume-header { flex-direction: column; text-align: center; }
   .resume-grid { grid-template-columns: 1fr; }
-  .save-bar { flex-direction: column; align-items: stretch; text-align: center; }
-  .save-bar-actions { justify-content: center; }
+  .save-bar { flex-direction: column; align-items: stretch; text-align: center; padding: 10px 16px; }
+  .save-bar-actions { justify-content: center; flex-wrap: wrap; }
   .preview-controls { flex-direction: column; }
   .page-header { flex-direction: column; align-items: flex-start; }
+  .btn { font-size: 0.8rem; padding: 8px 14px; }
+  .form-group label { font-size: 0.8rem; }
+  input, select, textarea { font-size: 0.85rem; }
+  .resume-card-preview { height: 80px; }
+  .header-actions { gap: 6px; }
 }
 
 /* ===== PRINT STYLES ===== */
 @media print {
   body { background: #fff; }
-  .header, .save-bar, .preview-controls, .builder-form, .no-print { display: none !important; }
-  .builder-container { display: block; }
-  .builder-preview { position: static; }
-  .preview-frame { box-shadow: none; border: none; border-radius: 0; }
-  .preview-content { padding: 20px; }
+  .header, .save-bar, .preview-controls, .builder-form { display: none !important; }
+  .main-content.no-print { display: block !important; padding: 0 !important; }
+  .builder-container { display: block !important; }
+  .builder-preview { display: block !important; position: static !important; }
+  .preview-frame { display: block !important; box-shadow: none; border: none; border-radius: 0; }
+  .preview-content { display: block !important; padding: 20px; }
   @page { margin: 0.5cm; }
 }

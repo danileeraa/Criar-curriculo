@@ -32,7 +32,11 @@
         <h1>Meus Currículos</h1>
         <p>Gerencie todos os seus currículos em um só lugar.</p>
       </div>
-      <a href="builder.html" class="btn btn-primary btn-lg">+ Novo Currículo</a>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="builder.html" class="btn btn-primary btn-lg">+ Novo Currículo</a>
+        <button class="btn btn-secondary" onclick="exportData()">Exportar Dados</button>
+        <button class="btn btn-secondary" onclick="importData()">Importar Dados</button>
+      </div>
     </div>
     <div class="resume-grid" id="resumeGrid">
       <div class="loading"><div class="spinner"></div></div>

@@ -112,6 +112,44 @@
       .join('');
   }
 
+  function exportData() {
+    const data = localStorage.getItem('curriculo_app');
+    if (!data) { alert('Nenhum dado para exportar.'); return; }
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'curriculo-backup.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (!data.users && !data.resumes) throw new Error('Arquivo inválido');
+          const existing = localStorage.getItem('curriculo_app');
+          if (existing && !confirm('Isso substituirá todos os dados locais. Continuar?')) return;
+          localStorage.setItem('curriculo_app', JSON.stringify(data));
+          alert('Dados importados com sucesso!');
+          location.reload();
+        } catch {
+          alert('Arquivo inválido. Selecione um backup válido.');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+
   window.Dashboard = {
     load: loadDashboard,
 
