@@ -143,22 +143,30 @@
       ? `<img src="${p.photo}" alt="Foto">`
       : `<div class="no-photo">👤</div>`;
 
-    const socialIcons = { LinkedIn:'💼', GitHub:'💻', Twitter:'🐦', Instagram:'📸', Facebook:'👍', YouTube:'▶️', Portfolio:'🌐', Outro:'🔗' };
+    const socialIcons = {
+      LinkedIn:'https://static.vecteezy.com/system/resources/previews/018/930/480/non_2x/linkedin-logo-linkedin-icon-transparent-free-png.png',
+      GitHub:'https://images.icon-icons.com/936/PNG/512/github-logo_icon-icons.com_73546.png',
+      Twitter:'https://upload.wikimedia.org/wikipedia/commons/c/ce/X_icon.svg',
+      Instagram:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/1200px-Instagram_logo_2016.svg.png',
+      Facebook:'https://static.vecteezy.com/system/resources/previews/018/930/476/non_2x/facebook-logo-facebook-icon-transparent-free-png.png',
+      YouTube:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/1200px-YouTube_full-color_icon_%282017%29.svg.png',
+      Portfolio:'https://static.vecteezy.com/system/resources/thumbnails/067/385/088/small/portfolio-icon-in-black-color-vector.jpg',
+      Outro:'https://img.icons8.com/glyph-neue/1200/connection-status-off.jpg'
+    };
     function extractProfileName(url, platform) {
       try {
+        if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
         const u = new URL(url);
         const path = u.pathname.replace(/\/+$/, '');
-        if (platform === 'LinkedIn') return path.replace(/\/in\/|\/company\//g, '') || platform;
-        if (platform === 'GitHub' || platform === 'Twitter' || platform === 'Instagram' || platform === 'Facebook')
-          return path.replace(/^\//, '').split('/')[0] || platform;
+        if (platform === 'LinkedIn') return path.replace(/\/in\/|\/company\//g, '').replace(/^\//, '') || platform;
         if (platform === 'YouTube') return path.replace(/^\/@/, '').split('/')[0] || platform;
         return path.replace(/^\//, '').split('/')[0] || platform;
       } catch { return platform; }
     }
     const socialHtml = (data.social || []).map(s => {
-      const icon = socialIcons[s.platform] || '🔗';
+      const iconUrl = socialIcons[s.platform] || socialIcons.Outro;
       const name = extractProfileName(s.url, s.platform);
-      return `<a href="${escapeHtml(s.url)}" target="_blank" title="${escapeHtml(s.platform)}">${icon} ${escapeHtml(name)}</a>`;
+      return `<a href="${escapeHtml(s.url)}" target="_blank" title="${escapeHtml(s.platform)}"><img src="${iconUrl}" alt="" style="width:14px;height:14px"> ${escapeHtml(name)}</a>`;
     }).join('');
 
     const educationHtml = (data.education || []).filter(e => e.institution || e.degree).map(e => `
