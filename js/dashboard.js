@@ -94,7 +94,7 @@
     let favTemplate = '-';
     let maxCount = 0;
     for (const [tpl, count] of Object.entries(templateCounts)) {
-      if (count > maxCount) { maxCount = count; favTemplate = getTemplateLabel(tpl); }
+      if (count > maxCount) { maxCount = count; favTemplate = tpl.charAt(0).toUpperCase() + tpl.slice(1).replace(/-/g, ' '); }
     }
 
     document.getElementById('kpiTotal').textContent = userResumes.length;
