@@ -143,33 +143,17 @@
       ? `<img src="${p.photo}" alt="Foto">`
       : `<div class="no-photo">👤</div>`;
 
-    function socialIconSvg(platform) {
-      const svgs = {
-        LinkedIn:'<svg viewBox="0 0 24 24" width="14" height="14"><rect x="2" y="2" width="20" height="20" rx="4" fill="#0a66c2"/><text x="12" y="17" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="Arial">in</text></svg>',
-        GitHub:'<svg viewBox="0 0 24 24" width="14" height="14"><path fill="#333" d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.78c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.28.1-2.68 0 0 .84-.27 2.75 1.02A9.62 9.62 0 0 1 12 6.32a9.58 9.58 0 0 1 2.5.34c1.91-1.3 2.75-1.02 2.75-1.02.55 1.4.2 2.43.1 2.68.64.7 1.03 1.59 1.03 2.68 0 3.81-2.34 4.67-4.57 4.92.36.31.68.92.68 1.85v2.74c0 .27.16.59.67.5A10.04 10.04 0 0 0 22 12c0-5.52-4.48-10-10-10z"/></svg>',
-        Twitter:'<svg viewBox="0 0 24 24" width="14" height="14"><path fill="#000" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
-        Instagram:'<svg viewBox="0 0 24 24" width="14" height="14"><rect x="2" y="2" width="20" height="20" rx="5" fill="url(#ig)"/><defs><radialGradient id="ig"><stop offset="0%" stop-color="#f58529"/><stop offset="50%" stop-color="#dd2a7b"/><stop offset="100%" stop-color="#8134af"/></radialGradient></defs><circle cx="12" cy="12" r="5" fill="none" stroke="#fff" stroke-width="1.2"/><circle cx="17.5" cy="6.5" r="1.2" fill="#fff"/></svg>',
-        Facebook:'<svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="10" fill="#1877f2"/><path fill="#fff" d="M13.5 21.5v-7.5h2.5l.5-3H13.5V9c0-.87.24-1.5 1.5-1.5h2V4.7c-.4-.05-1.3-.2-2.8-.2-3 0-5 1.8-5 5.2v2.3H8v3h2.5v7.5z"/></svg>',
-        YouTube:'<svg viewBox="0 0 24 24" width="14" height="14"><rect x="2" y="5" width="20" height="14" rx="3.5" fill="#ff0000"/><polygon points="10,8 10,16 17,12" fill="#fff"/></svg>',
-        Portfolio:'<svg viewBox="0 0 24 24" width="14" height="14"><path fill="#475569" d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v3h20V8c0-1.1-.9-2-2-2zm-6 0h-4V4h4v2zM2 13v5c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-5H2z"/></svg>',
-        Outro:'<svg viewBox="0 0 24 24" width="14" height="14"><path fill="#64748b" d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>'
-      };
-      return svgs[platform] || svgs.Outro;
-    }
-    function extractProfileName(url, platform) {
-      try {
-        if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
-        const u = new URL(url);
-        const path = u.pathname.replace(/\/+$/, '');
-        if (platform === 'LinkedIn') return path.replace(/\/in\/|\/company\//g, '').replace(/^\//, '') || 'linkedin';
-        if (platform === 'YouTube') return path.replace(/^\/@/, '').split('/')[0] || 'youtube';
-        return path.replace(/^\//, '').split('/')[0] || platform.toLowerCase();
-      } catch { return platform.toLowerCase(); }
-    }
     const socialHtml = (data.social || []).map(s => {
-      const svg = socialIconSvg(s.platform);
-      const name = extractProfileName(s.url, s.platform);
-      return `<a href="${escapeHtml(s.url)}" target="_blank" title="${escapeHtml(s.platform)}" style="text-decoration:none">${svg} <span style="vertical-align:middle">${escapeHtml(name)}</span></a>`;
+      let name = s.platform;
+      try {
+        let u = s.url;
+        if (!u.startsWith('http://') && !u.startsWith('https://')) u = 'https://' + u;
+        const parsed = new URL(u);
+        const path = parsed.pathname.replace(/\/+$/, '');
+        const parts = path.split('/').filter(Boolean);
+        if (parts.length) name = parts[parts.length - 1];
+      } catch {}
+      return `<div style="margin:2px 0;font-size:0.82rem"><strong>${escapeHtml(s.platform)}:</strong> ${escapeHtml(name)}</div>`;
     }).join('');
 
     const educationHtml = (data.education || []).filter(e => e.institution || e.degree).map(e => `
@@ -261,7 +245,7 @@
 
     const mainCerts = certsHtml ? `<h3>Certificações</h3>${certsHtml}` : '';
     const mainProjects = projectsHtml ? `<h3>Projetos</h3>${projectsHtml}` : '';
-    const sidebarSocial = socialHtml ? `<h3>Redes Sociais</h3><div class="social-icons">${socialHtml}</div>` : '';
+    const sidebarSocial = socialHtml ? `<h3>Redes Sociais</h3><div style="margin-top:6px">${socialHtml}</div>` : '';
 
     function sumHtml(html, empty) { return html || empty || ''; }
 
