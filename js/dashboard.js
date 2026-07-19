@@ -117,6 +117,148 @@
       .join('');
   }
 
+  function parseResumeText(text) {
+    const data = { name: '', title: '', email: '', phone: '', address: '', website: '', summary: '',
+      social: [], education: [], experience: [], skills: [], languages: [], certifications: [], projects: [] };
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    let i = 0;
+
+    function peek() { return lines[i] || ''; }
+    function next() { return lines[i++] || ''; }
+
+    const labelPattern = /^(Nome|Email|Telefone|Endereço|Site|LinkedIn|GitHub|Instagram|Twitter|Facebook|YouTube|TikTok|Cargo|Profissão|Título)\s*[:]\s*(.+)/i;
+
+    while (i < lines.length) {
+      const line = next();
+      const labelMatch = line.match(labelPattern);
+      if (labelMatch) {
+        const key = labelMatch[1].toLowerCase();
+        const val = labelMatch[2];
+        if (key === 'nome') data.name = val;
+        else if (key === 'email') data.email = val;
+        else if (key === 'telefone' || key === 'tel') data.phone = val;
+        else if (key === 'endereço' || key === 'endereco') data.address = val;
+        else if (key === 'site') data.website = val;
+        else if (key === 'cargo' || key === 'profissão' || key === 'profissao' || key === 'título' || key === 'titulo') data.title = val;
+        else if (['linkedin','github','instagram','twitter','facebook','youtube','tiktok'].includes(key)) {
+          data.social.push({ platform: key.charAt(0).toUpperCase() + key.slice(1), url: val });
+        }
+        continue;
+      }
+
+      const secMatch = line.match(/^(Experiência|Experiencia|Formação|Formacao|Educação|Educacao|Habilidades|Competências|Competencias|Idiomas|Certificações|Certificacoes|Projetos|Resumo|Objetivo|Perfil)\s*:?$/i);
+      if (secMatch) {
+        const sec = secMatch[1].toLowerCase();
+        if (sec === 'resumo' || sec === 'objetivo' || sec === 'perfil') {
+          data.summary = (data.summary + ' ' + collectSection()).trim();
+        } else if (sec.startsWith('experiên') || sec.startsWith('experien')) {
+          parseExperience();
+        } else if (sec.startsWith('forma') || sec.startsWith('educa')) {
+          parseEducation();
+        } else if (sec.startsWith('habil') || sec.startsWith('compet')) {
+          parseSkills();
+        } else if (sec.startsWith('idioma')) {
+          parseLanguages();
+        } else if (sec.startsWith('certif')) {
+          parseCertifications();
+        } else if (sec.startsWith('projet')) {
+          parseProjects();
+        }
+        continue;
+      }
+
+      data.summary = (data.summary + ' ' + line).trim();
+    }
+
+    function collectSection() {
+      const lines = [];
+      while (i < lines.length && !peek().match(/^(Experiência|Experiencia|Formação|Formacao|Educação|Educacao|Habilidades|Competências|Competencias|Idiomas|Certificações|Certificacoes|Projetos|Resumo|Objetivo|Perfil)\s*:?$/i) && !peek().match(labelPattern)) {
+        lines.push(next());
+      }
+      return lines.join(' ');
+    }
+
+    function parseExperience() {
+      while (i < lines.length) {
+        const l = peek();
+        if (l.match(/^(Formação|Formacao|Educação|Educacao|Habilidades|Competências|Competencias|Idiomas|Certificações|Certificacoes|Projetos)\s*:?$/i)) break;
+        if (l.match(labelPattern)) break;
+        const parts = l.split(/[–\-–|/]/);
+        const company = parts[0].trim();
+        const position = parts.length > 1 ? parts[1].trim() : '';
+        const dates = l.match(/(\d{4})\s*[–\-–]\s*(\d{4}|presente|atual|o\s*momento)/i);
+        const entry = { company, position, location: '', startDate: dates ? dates[1] : '', endDate: dates ? (dates[2].match(/\d{4}/) ? dates[2] : '') : '', current: dates ? !dates[2].match(/\d{4}/) : false, description: '' };
+        const desc = [];
+        while (i + 1 < lines.length && !peek().match(/^[A-ZÀ-Ú][a-zà-ú]+[\s:]/) && !peek().match(/^\d{4}/) && !peek().match(/^(Experiência|Experiencia|Formação|Formacao)\s*:?$/i)) {
+          desc.push(next());
+        }
+        entry.description = desc.join(' ');
+        data.experience.push(entry);
+        next();
+      }
+    }
+
+    function parseEducation() {
+      while (i < lines.length) {
+        const l = peek();
+        if (l.match(/^(Experiência|Experiencia|Habilidades|Competências|Competencias|Idiomas|Certificações|Certificacoes|Projetos)\s*:?$/i)) break;
+        if (l.match(labelPattern)) break;
+        const parts = l.split(/[–\-–|/]/);
+        const institution = parts[0].trim();
+        const degree = parts.length > 1 ? parts[1].trim() : '';
+        const dates = l.match(/(\d{4})\s*[–\-–]\s*(\d{4}|presente|atual|o\s*momento)/i);
+        data.education.push({ institution, degree, field: parts.length > 2 ? parts[2].trim() : '', startDate: dates ? dates[1] : '', endDate: dates ? (dates[2].match(/\d{4}/) ? dates[2] : '') : '', description: '', location: '' });
+        next();
+      }
+    }
+
+    function parseSkills() {
+      while (i < lines.length) {
+        const l = peek();
+        if (l.match(/^(Experiência|Experiencia|Formação|Formacao|Educação|Educacao|Idiomas|Certificações|Certificacoes|Projetos)\s*:?$/i)) break;
+        if (l.match(labelPattern)) break;
+        l.split(/[,;•·\-]/).forEach(s => {
+          const skill = s.trim().replace(/^\d+\s*[-.]?\s*/, '');
+          if (skill) data.skills.push({ name: skill, level: 50, category: 'technical' });
+        });
+        next();
+      }
+    }
+
+    function parseLanguages() {
+      while (i < lines.length) {
+        const l = peek();
+        if (l.match(/^(Experiência|Experiencia|Formação|Formacao|Educação|Educacao|Habilidades|Competências|Competencias|Certificações|Certificacoes|Projetos)\s*:?$/i)) break;
+        if (l.match(labelPattern)) break;
+        const parts = l.split(/[–\-–:]/);
+        data.languages.push({ name: parts[0].trim(), proficiency: parts.length > 1 ? parts[1].trim() : 'Intermediário' });
+        next();
+      }
+    }
+
+    function parseCertifications() {
+      while (i < lines.length) {
+        const l = peek();
+        if (l.match(/^(Experiência|Experiencia|Formação|Formacao|Educação|Educacao|Habilidades|Competências|Competencias|Idiomas|Projetos)\s*:?$/i)) break;
+        if (l.match(labelPattern)) break;
+        data.certifications.push({ name: l, issuer: '', date: '', description: '' });
+        next();
+      }
+    }
+
+    function parseProjects() {
+      while (i < lines.length) {
+        const l = peek();
+        if (l.match(/^(Experiência|Experiencia|Formação|Formacao|Educação|Educacao|Habilidades|Competências|Competencias|Idiomas|Certificações|Certificacoes)\s*:?$/i)) break;
+        if (l.match(labelPattern)) break;
+        data.projects.push({ name: l, techs: '', description: '', link: '' });
+        next();
+      }
+    }
+
+    return data;
+  }
+
   // Import resume data (JSON/text - no AI)
   let importType = 'json';
 
@@ -133,7 +275,7 @@
     document.getElementById('importLabel').textContent = type === 'json' ? 'Cole o conteúdo JSON' : 'Cole o texto do currículo';
     document.getElementById('importContent').placeholder = type === 'json'
       ? '{"name":"João","professionalTitle":"...", ...}'
-      : 'Nome: João Silva\nCargo: Engenheiro\nExperiência: ...';
+      : 'Nome: João Silva\nCargo: Engenheiro\nExperiência: …';
     document.getElementById('importFileInput').accept = type === 'json' ? '.json' : '.txt';
   };
 
@@ -187,7 +329,7 @@
       try { parsedData = JSON.parse(content); }
       catch { errorText.textContent = 'JSON inválido. Verifique a sintaxe.'; errorEl.classList.remove('hidden'); return; }
     } else {
-      parsedData = { summary: content };
+      parsedData = parseResumeText(content);
     }
 
     const user = Auth.getCurrentUser();
