@@ -69,13 +69,26 @@
     },
 
     print(element) {
-      const original = document.body.innerHTML;
-      const printContent = element.cloneNode(true);
-      document.body.innerHTML = '';
-      document.body.appendChild(printContent);
-      window.print();
-      document.body.innerHTML = original;
-      window.location.reload();
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.top = '-9999px';
+      iframe.style.width = '210mm';
+      iframe.style.height = '297mm';
+      document.body.appendChild(iframe);
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write('<html><head>');
+      doc.write('<link rel="stylesheet" href="css/style.css">');
+      doc.write('<style>body{margin:0;padding:20px;font-family:Arial,sans-serif}</style>');
+      doc.write('</head><body>');
+      doc.write(element.innerHTML);
+      doc.write('</body></html>');
+      doc.close();
+      iframe.onload = () => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        setTimeout(() => document.body.removeChild(iframe), 1000);
+      };
     },
 
     async copyToClipboard(element) {

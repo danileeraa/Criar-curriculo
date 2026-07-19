@@ -68,7 +68,7 @@
         <div class="resume-card-body">
           <h3 title="${resume.personalInfo?.name || 'Sem título'}">${resume.personalInfo?.name || 'Sem título'}</h3>
           <div class="resume-meta">
-            ${getTemplateLabel(resume.template || 'desenvolvedor')} &middot; ${dateStr}
+            ${dateStr}
             ${resume.personalInfo?.title ? '&middot; ' + resume.personalInfo.title : ''}
           </div>
           <div class="resume-card-actions">
