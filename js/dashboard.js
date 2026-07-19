@@ -23,11 +23,6 @@
 
   let deleteTargetId = null;
 
-  function getTemplateLabel(t) {
-    const m = { desenvolvedor:'Desenvolvedor', designer:'Designer', advocacia:'Advocacia', medicina:'Medicina', engenharia:'Engenharia', marketing:'Marketing', professor:'Professor', administrativo:'Administrativo', 'jovem-aprendiz':'Jovem Aprendiz', executivo:'Executivo' };
-    return m[t] || t;
-  }
-
   function renderResumeCard(resume) {
     const created = new Date(resume.createdAt || Date.now());
     const dateStr = created.toLocaleDateString('pt-BR');
@@ -55,8 +50,7 @@
               <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full"><svg class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Salvo</span>
             </div>
             <div class="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-500 mt-1">
-              <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full ${dot}"></span> ${escapeHtml(getTemplateLabel(tpl))}</span>
-              <span class="flex items-center gap-1"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> ${dateStr}</span>
+              <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full ${dot}"></span> ${dateStr}</span>
               ${title ? `<span class="flex items-center gap-1"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> ${escapeHtml(title)}</span>` : ''}
             </div>
           </div>
