@@ -123,6 +123,14 @@
     return div.innerHTML;
   }
 
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
+    return dateStr;
+  }
+
   function renderPreview() {
     const data = getFormData();
     const template = data.template || 'desenvolvedor';
@@ -143,7 +151,7 @@
       <div class="entry">
         <div class="entry-title">${escapeHtml(e.degree)}${e.field ? ' em ' + escapeHtml(e.field) : ''}</div>
         <div class="entry-subtitle">${escapeHtml(e.institution)}${e.location ? ', ' + escapeHtml(e.location) : ''}</div>
-        <div class="entry-date">${escapeHtml(e.startDate)}${e.endDate ? ' - ' + escapeHtml(e.endDate) : ''}</div>
+        <div class="entry-date">${formatDate(e.startDate)}${e.endDate ? ' - ' + formatDate(e.endDate) : ''}</div>
         ${e.description ? '<div class="entry-desc">' + escapeHtml(e.description) + '</div>' : ''}
       </div>
     `).join('');
@@ -152,7 +160,7 @@
       <div class="entry">
         <div class="entry-title">${escapeHtml(e.position)}</div>
         <div class="entry-subtitle">${escapeHtml(e.company)}${e.location ? ', ' + escapeHtml(e.location) : ''}</div>
-        <div class="entry-date">${escapeHtml(e.startDate)}${e.current ? ' - Presente' : e.endDate ? ' - ' + escapeHtml(e.endDate) : ''}</div>
+        <div class="entry-date">${formatDate(e.startDate)}${e.current ? ' - Presente' : e.endDate ? ' - ' + formatDate(e.endDate) : ''}</div>
         ${e.description ? '<div class="entry-desc">' + escapeHtml(e.description) + '</div>' : ''}
       </div>
     `).join('');
@@ -192,7 +200,7 @@
     const certsHtml = (data.certifications || []).filter(c => c.name).map(c => `
       <div class="entry">
         <div class="entry-title">${escapeHtml(c.name)}</div>
-        <div class="entry-subtitle">${escapeHtml(c.issuer)}${c.date ? ' - ' + escapeHtml(c.date) : ''}</div>
+        <div class="entry-subtitle">${escapeHtml(c.issuer)}${c.date ? ' - ' + formatDate(c.date) : ''}</div>
         ${c.description ? '<div class="entry-desc">' + escapeHtml(c.description) + '</div>' : ''}
       </div>
     `).join('');
@@ -345,6 +353,7 @@
             </div>
           </div>
           ${allSkills.length ? `<h3>Áreas de Atuação</h3><div class="skill-chips">${skillChipsHtml}</div>` : ''}
+          ${sidebarSocial ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0">${sidebarSocial}</div>` : ''}
           <div class="contact-bar" style="margin-top:16px;border-top:1px solid #e2e8f0;padding-top:12px">${contactBarHtml}</div>
         </div>
       `;
@@ -368,6 +377,7 @@
           </div>
           <div class="resume-sidebar">
             ${contactHtml}
+            ${sidebarSocial}
             ${allSkills.length ? `<h3>Competências</h3><div style="margin-bottom:12px">${skillTagsHtml}</div>` : ''}
             ${languagesHtml ? `<h3>Idiomas</h3>${languagesHtml}` : ''}
             ${mainProjects ? `<h3>Projetos</h3>${projectsHtml}` : ''}
@@ -427,6 +437,7 @@
               ${languagesHtml || '<p style="color:#94a3b8;font-size:0.85rem">Nenhum idioma adicionado</p>'}
             </div>
           </div>
+          ${sidebarSocial ? `<div style="margin-top:12px">${sidebarSocial}</div>` : ''}
           ${allSkills.length ? `<h3>Áreas de Conhecimento</h3><div class="skill-chips">${skillChipsHtml}</div>` : ''}
           <div class="contact-bar" style="margin-top:16px;border-top:1px solid #e2e8f0;padding-top:12px">${contactBarHtml}</div>
         </div>
@@ -481,6 +492,7 @@
           ${allSkills.length ? `<h3>Habilidades</h3><div class="skill-chips" style="margin-bottom:12px">${skillChipsHtml}</div>` : ''}
           ${experienceHtml ? `<h3>Experiência</h3>${experienceHtml}` : ''}
           ${mainCerts}
+          ${sidebarSocial ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0">${sidebarSocial}</div>` : ''}
           <div class="contact-bar" style="margin-top:12px;border-top:1px solid #e2e8f0;padding-top:10px;font-size:0.82rem">${contactBarHtml}</div>
         </div>
       `;
@@ -581,8 +593,8 @@
         <div class="form-group"><label>Área de Estudo</label><input class="ed-field" value="${escapeHtml(data?.field || '')}"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Data Início</label><input type="month" class="ed-start" value="${escapeHtml(data?.startDate || '')}"></div>
-        <div class="form-group"><label>Data Término</label><input type="month" class="ed-end" value="${escapeHtml(data?.endDate || '')}"></div>
+        <div class="form-group"><label>Data Início</label><input type="date" class="ed-start" value="${escapeHtml(data?.startDate || '')}"></div>
+        <div class="form-group"><label>Data Término</label><input type="date" class="ed-end" value="${escapeHtml(data?.endDate || '')}"></div>
       </div>
       <div class="form-group"><label>Descrição</label><textarea class="ed-desc" rows="2">${escapeHtml(data?.description || '')}</textarea></div>
     `;
@@ -601,10 +613,10 @@
       </div>
       <div class="form-row">
         <div class="form-group"><label>Localização</label><input class="exp-location" value="${escapeHtml(data?.location || '')}"></div>
-        <div class="form-group"><label>Data Início</label><input type="month" class="exp-start" value="${escapeHtml(data?.startDate || '')}"></div>
+        <div class="form-group"><label>Data Início</label><input type="date" class="exp-start" value="${escapeHtml(data?.startDate || '')}"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Data Término</label><input type="month" class="exp-end" value="${escapeHtml(data?.endDate || '')}"></div>
+        <div class="form-group"><label>Data Término</label><input type="date" class="exp-end" value="${escapeHtml(data?.endDate || '')}"></div>
         <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:10px">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
             <input type="checkbox" class="exp-current" ${data?.current ? 'checked' : ''}> Trabalho atual
@@ -656,7 +668,7 @@
         <div class="form-group"><label>Instituição</label><input class="cert-issuer" value="${escapeHtml(data?.issuer || '')}"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Data</label><input type="month" class="cert-date" value="${escapeHtml(data?.date || '')}"></div>
+        <div class="form-group"><label>Data</label><input type="date" class="cert-date" value="${escapeHtml(data?.date || '')}"></div>
         <div class="form-group"></div>
       </div>
       <div class="form-group"><label>Descrição</label><textarea class="cert-desc" rows="2">${escapeHtml(data?.description || '')}</textarea></div>
@@ -729,11 +741,12 @@
     }
 
     (resume.social || []).forEach(s => addSocial(s));
-    (resume.education || []).forEach(e => addEducation(e));
-    (resume.experience || []).forEach(e => addExperience(e));
+    function normalizeDate(d) { return d && d.match(/^\d{4}-\d{2}$/) ? d + '-01' : d; }
+    (resume.education || []).forEach(e => { e.startDate = normalizeDate(e.startDate); e.endDate = normalizeDate(e.endDate); addEducation(e); });
+    (resume.experience || []).forEach(e => { e.startDate = normalizeDate(e.startDate); e.endDate = normalizeDate(e.endDate); addExperience(e); });
     (resume.skills || []).forEach(s => addSkill(s));
     (resume.languages || []).forEach(l => addLanguage(l));
-    (resume.certifications || []).forEach(c => addCertification(c));
+    (resume.certifications || []).forEach(c => { c.date = normalizeDate(c.date); addCertification(c); });
     (resume.projects || []).forEach(p => addProject(p));
 
     renderPreview();
